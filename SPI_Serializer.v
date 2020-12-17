@@ -39,7 +39,10 @@ output wire CS);
     reg [31:0] clk_counter_r;
     reg [31:0] clk_divider_value = 24576; //49152 / 2
     reg output_clk_r;
+    reg output_clk_r_buf;
     reg CS_r;
+
+    reg [31:0] Bitshift_counter;
 
 
     //Setting the initial value of all registers.
@@ -47,8 +50,10 @@ output wire CS);
     initial begin 
         data_register_r = 0;
         output_clk_r = 0;
+        output_clk_r_buf = 0;
         CS_r = 0;
         clk_counter_r = 0;
+        Bitshift_counter = 0;
     end
 
     //The initial state is IDLE. 
@@ -57,7 +62,7 @@ output wire CS);
     end
 
     always @(posedge clk) begin
-        if STATE_CURRENT == STATE_TRAN) begin 
+        if (STATE_CURRENT == STATE_TRAN) begin 
             if (clk_counter_r == clk_divider_value) begin
                 clk_counter_r <= 0;
                 output_clk_r = ~output_clk_r;
@@ -67,17 +72,31 @@ output wire CS);
         end
     end
 
+    always @(negedge output_clk_r) begin //Shifting data on the negative edge
+        data_register_r = data_register_r >> 1;
+    end
 
     always @(posedge clk) begin
-        if (ld == 1'b1) begin
-            data_register_r <= Data_Register; // load the new data into the register
-            STATE_CURRENT <= STATE_TRAN; // loading also starts transmitting
-        end
+
         case (STATE_CURRENT)
-            case STATE_IDLE: begin
-                
+            STATE_IDLE: begin
+                if (ld == 1'b1) begin
+                    data_register_r <= Data_Register; // load the new data into the register
+                    STATE_CURRENT <= STATE_TRAN; // loading also starts transmitting
+                end
             end
-            case STATE_TRAN: begin
+            STATE_TRAN: begin
+                output_clk_r_buf <= output_clk_r;
+                if (!output_clk_r_buf & output_clk_r == 1) begin
+                    if (Bitshift_counter != Shift_BitCount) begin
+                        Bitshift_counter <= Bitshift_counter + 1;
+                    end else begin
+                        Bitshift_counter <= 0;
+                        STATE_CURRENT <= STATE_IDLE;
+                    end
+                end
+            end
+            default :begin
                 
             end
         endcase
