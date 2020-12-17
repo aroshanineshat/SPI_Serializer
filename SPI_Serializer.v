@@ -1,3 +1,22 @@
+//////////////////////////////////////////////////////////////////////////////////
+// The University of Arizona
+// Engineer: Arash Roshanineshat
+// 
+// Design Name: SPI Serializer
+// Module Name: SPI_Serializer
+// Target Devices: ZCU111 Dev Board
+// Description: 
+//      This module is used to communicate with signal attenuators on a daughter
+//      board connected to the ZCU111 development board.
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+`timescale 1ns / 1ps
+
 module SPI_Serializer
 #(
     parameter integer Register_Width = 32,
