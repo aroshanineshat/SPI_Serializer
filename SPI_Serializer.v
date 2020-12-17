@@ -37,21 +37,34 @@ output wire CS);
 
     reg [Register_Width-1:0] data_register_r;
     reg [31:0] clk_counter_r;
-    reg [31:0] clk_divider_value = 49152;
+    reg [31:0] clk_divider_value = 24576; //49152 / 2
     reg output_clk_r;
     reg CS_r;
 
 
-    initial begin
+    //Setting the initial value of all registers.
+    //They all can be zero.
+    initial begin 
         data_register_r = 0;
         output_clk_r = 0;
         CS_r = 0;
         clk_counter_r = 0;
+    end
+
+    //The initial state is IDLE. 
+    initial begin
         STATE_CURRENT = STATE_IDLE;
     end
 
     always @(posedge clk) begin
-        
+        if STATE_CURRENT == STATE_TRAN) begin 
+            if (clk_counter_r == clk_divider_value) begin
+                clk_counter_r <= 0;
+                output_clk_r = ~output_clk_r;
+            end else begin
+                clk_counter_r <= clk_counter_r +1;
+            end
+        end
     end
 
 
@@ -69,5 +82,8 @@ output wire CS);
             end
         endcase
     end
+
+    assign DataBit = data_register_r[0];
+    assign SPI_clk = output_clk_r;
 
 endmodule
