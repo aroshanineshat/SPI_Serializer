@@ -12,7 +12,6 @@ module test;
     initial begin
         clk = 0;
         ld  = 0;
-        Inputdata = 32'b00000000_100111100_01101100_10001101;
 
         forever begin
             #1 clk = ~clk;
@@ -22,6 +21,13 @@ module test;
     initial begin
         #10 ld = 1;
         #15 ld = 0;
+        #2505 ld = 1;
+        #5 ld = 0;
+    end
+
+    initial begin
+        #5      Inputdata = 32'b00000000_10011110_01101100_10001101;
+        #2500   Inputdata = 32'b00000000_10000000_11110000_11111111;
     end
 
     SPI_Serializer inst1 
