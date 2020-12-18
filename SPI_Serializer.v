@@ -43,8 +43,8 @@ output wire CS);
     reg [Register_Width-1:0] data_register_r;
     reg [31:0] clk_counter_r;
     reg [31:0] clk_divider_value = 20; //49152 / 2
-    reg output_clk_r;
-    reg output_clk_r_buf;
+    reg slow_clk_r;
+    reg slow_clk_r_buf;
     reg SPI_clk_r;
 
     reg CS_r_buf;
@@ -57,11 +57,12 @@ output wire CS);
     //They all can be zero.
     initial begin 
         data_register_r = 0;
-        output_clk_r = 0;
-        output_clk_r_buf = 0;
+        slow_clk_r = 0;
+        slow_clk_r_buf = 0;
         CS_r = 0;
         CS_r_buf = 0;
         clk_counter_r = 0;
+        SPI_clk_r = 0;
         Bitshift_counter = 0;
     end
 
@@ -73,13 +74,13 @@ output wire CS);
     always @(posedge clk) begin
         if (clk_counter_r == clk_divider_value) begin
             clk_counter_r <= 0;
-            output_clk_r  <= ~output_clk_r;
+            slow_clk_r  <= ~slow_clk_r;
         end else begin
             clk_counter_r <= clk_counter_r+1;
         end
     end
 
-    always @(negedge output_clk_r) begin //Shifting data on the negative edge
+    always @(negedge slow_clk_r) begin //Shifting data on the negative edge
         if (STATE_CURRENT == STATE_TRAN) begin
             data_register_r <= data_register_r >> 1;
             if (Bitshift_counter != Shift_BitCount) begin
@@ -110,7 +111,7 @@ output wire CS);
                 end
             end
             STATE_TRAN: begin
-                SPI_clk_r        <= output_clk_r;
+                SPI_clk_r        <= slow_clk_r;
                 //output_clk_r_buf <= output_clk_r;
                 //if (!output_clk_r_buf & output_clk_r == 1) begin
                 if (Bitshift_counter == Shift_BitCount) begin

@@ -20,9 +20,9 @@ module test;
 
     initial begin
         #10 ld = 1;
-        #15 ld = 0;
+        #50 ld = 0;
         #2505 ld = 1;
-        #5 ld = 0;
+        #50 ld = 0;
     end
 
     initial begin
@@ -39,7 +39,7 @@ module test;
 .CS(serial_cs));
 
     initial begin
-        #5000 $finish;
+        #2400 $finish;
     end
 
     initial
