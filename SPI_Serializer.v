@@ -29,12 +29,15 @@ output wire DataBit,
 output wire SPI_clk,
 output wire CS);
 
+
+    //Configuring States--------------------------
     parameter STATE_BitC = 4;
     parameter [STATE_BitC-1:0] STATE_IDLE = 'd0;
     parameter [STATE_BitC-1:0] STATE_LOAD = 'd1;
     parameter [STATE_BitC-1:0] STATE_TRAN = 'd2;
 
     reg [STATE_BitC-1:0] STATE_CURRENT;
+    //--------------------------------------------
 
     reg [Register_Width-1:0] data_register_r;
     reg [31:0] clk_counter_r;
@@ -66,10 +69,13 @@ output wire CS);
         if (STATE_CURRENT == STATE_TRAN) begin 
             if (clk_counter_r == clk_divider_value) begin
                 clk_counter_r <= 0;
-                output_clk_r = ~output_clk_r;
+                output_clk_r  <= ~output_clk_r;
             end else begin
-                clk_counter_r <= clk_counter_r +1;
+                clk_counter_r <= clk_counter_r+1;
             end
+        end else begin
+            clk_counter_r <= 0;
+            output_clk_r <= 0;
         end
     end
 
