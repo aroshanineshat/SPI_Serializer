@@ -29,9 +29,9 @@ Install GTKwave (It's in your repo if you are using Ubuntu) and then simply do:
 
 Here is the simulation output:
 
-![Simulation Output] (img/SimulationOutput.png)
+![Simulation Output](img/SimulationOutput.png)
 
 and this is a timing diagram from the datasheet:
 
-![Datasheet Diagram] (img/DatasheetDiagram.png)
+![Datasheet Diagram](img/DatasheetDiagram.png)
 
