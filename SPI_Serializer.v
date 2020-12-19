@@ -47,7 +47,6 @@ output wire CS);
     reg slow_clk_r_buf;
     reg SPI_clk_r;
 
-    reg CS_r_buf;
     reg CS_r;
 
     reg [31:0] Bitshift_counter;
@@ -60,7 +59,6 @@ output wire CS);
         slow_clk_r = 0;
         slow_clk_r_buf = 0;
         CS_r = 0;
-        CS_r_buf = 0;
         clk_counter_r = 0;
         SPI_clk_r = 0;
         Bitshift_counter = 0;
@@ -112,12 +110,9 @@ output wire CS);
             end
             STATE_TRAN: begin
                 SPI_clk_r        <= slow_clk_r;
-                //output_clk_r_buf <= output_clk_r;
-                //if (!output_clk_r_buf & output_clk_r == 1) begin
                 if (Bitshift_counter == Shift_BitCount) begin
                     STATE_CURRENT <= STATE_CS;
                 end
-                //end
             end
             STATE_CS: begin
                 SPI_clk_r <= 0;
