@@ -70,15 +70,22 @@ output wire CS);
     end
 
     always @(posedge clk) begin
+
+          
+        if (clk_counter_r == clk_divider_value) begin
+            slow_clk_r <= ~slow_clk_r;
+        end else if (clk_counter_r == clk_divider_value/2) begin
+            slow_clk_r <= ~slow_clk_r;
+        end
+
         if (clk_counter_r == clk_divider_value) begin
             clk_counter_r <= 0;
-            slow_clk_r  <= ~slow_clk_r;
         end else begin
             clk_counter_r <= clk_counter_r+1;
         end
     end
 
-    always @(negedge slow_clk_r) begin //Shifting data on the negative edge
+    /*always @(negedge slow_clk_r) begin //Shifting data on the negative edge
         if (STATE_CURRENT == STATE_TRAN) begin
             data_register_r <= data_register_r >> 1;
             if (Bitshift_counter != Shift_BitCount) begin
@@ -88,7 +95,7 @@ output wire CS);
         else begin
             Bitshift_counter <= 0;
         end
-    end
+    end*/
 
     always @(posedge clk) begin
 
@@ -101,23 +108,36 @@ output wire CS);
                 CS_r <= 0;
             end
             STATE_LOAD:begin // This state waits till the LOAD pin is de-asserted
-                if (ld == 1'b0) begin
-                    STATE_CURRENT <= STATE_TRAN;
+                if (ld == 1'b0) begin 
+                    if (clk_counter_r == 0) begin
+                        STATE_CURRENT <= STATE_TRAN;
+                    end
                 end else begin
                     data_register_r <= Data_Register; 
                     STATE_CURRENT <= STATE_LOAD;
                 end
             end
             STATE_TRAN: begin
-                SPI_clk_r        <= slow_clk_r;
+                if (Bitshift_counter != Shift_BitCount) begin
+                    SPI_clk_r        <= slow_clk_r;
+                end else begin
+                    SPI_clk_r        <= 0;
+                end
+                if (clk_counter_r == clk_divider_value ) begin
+                    data_register_r <= data_register_r >> 1;
+                    if (Bitshift_counter != Shift_BitCount) begin
+                        Bitshift_counter <= Bitshift_counter + 1;
+                    end 
+                end
                 if (Bitshift_counter == Shift_BitCount) begin
+                    Bitshift_counter <= 0;
                     STATE_CURRENT <= STATE_CS;
+                    CS_r <= 1;
                 end
             end
             STATE_CS: begin
                 SPI_clk_r <= 0;
-                CS_r <= 1;
-                if (clk_counter_r == clk_divider_value) begin
+                if (clk_counter_r == clk_divider_value / 2) begin
                     STATE_CURRENT <= STATE_IDLE;
                 end
             end
