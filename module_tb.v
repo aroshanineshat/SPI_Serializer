@@ -19,15 +19,15 @@ module test;
     end
 
     initial begin
-        #10 ld = 1;
-        #50 ld = 0;
-        #2505 ld = 1;
-        #50 ld = 0;
+        #9 ld = 1;
+        #1 ld = 0;
+        #1199 ld = 1;
+        #1 ld = 0;
     end
 
     initial begin
         #5      Inputdata = 32'b00000000_10011110_01101101_01010101;
-        #2500   Inputdata = 32'b00000000_10000000_11110000_11111110;
+        #1190   Inputdata = 32'b00000000_10000000_11110000_11111110;
     end
 
     SPI_Serializer inst1 
@@ -39,7 +39,7 @@ module test;
 .CS(serial_cs));
 
     initial begin
-        #2400 $finish;
+        #5000 $finish;
     end
 
     initial

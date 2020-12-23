@@ -85,17 +85,6 @@ output wire CS);
         end
     end
 
-    /*always @(negedge slow_clk_r) begin //Shifting data on the negative edge
-        if (STATE_CURRENT == STATE_TRAN) begin
-            data_register_r <= data_register_r >> 1;
-            if (Bitshift_counter != Shift_BitCount) begin
-                Bitshift_counter <= Bitshift_counter + 1;
-            end
-        end 
-        else begin
-            Bitshift_counter <= 0;
-        end
-    end*/
 
     always @(posedge clk) begin
 
