@@ -20,14 +20,16 @@
 module SPI_Serializer
 #(
     parameter integer Register_Width = 32,
-    parameter integer Shift_BitCount = 24
+    parameter integer Shift_BitCount = 32
 )
 (input wire clk, 
 input wire [Register_Width-1:0] Data_Register,
 input wire ld,
+input wire [1:0] DelAttSelect,
 output wire DataBit,
 output wire SPI_clk,
-output wire CS);
+output wire Att_CS,
+output wire Del_CS);
 
 
     //Configuring States--------------------------
@@ -47,8 +49,9 @@ output wire CS);
     reg slow_clk_r_buf;
     reg SPI_clk_r;
 
-    reg CS_r;
-
+    reg Att_CS_r;
+    reg Del_CS_r;
+    
     reg [31:0] Bitshift_counter;
 
 
@@ -58,7 +61,8 @@ output wire CS);
         data_register_r = 0;
         slow_clk_r = 0;
         slow_clk_r_buf = 0;
-        CS_r = 0;
+        Att_CS_r = 0;
+        Del_CS_r = 0;
         clk_counter_r = 0;
         SPI_clk_r = 0;
         Bitshift_counter = 0;
@@ -94,7 +98,8 @@ output wire CS);
                     data_register_r <= Data_Register; // load the new data into the register
                     STATE_CURRENT   <= STATE_LOAD;    // loading also starts transmitting
                 end
-                CS_r <= 0;
+                Att_CS_r <= 0;
+                Del_CS_r <= 0;
             end
             STATE_LOAD:begin // This state waits till the LOAD pin is de-asserted
                 if (ld == 1'b0) begin 
@@ -121,7 +126,8 @@ output wire CS);
                 if (Bitshift_counter == Shift_BitCount) begin
                     Bitshift_counter <= 0;
                     STATE_CURRENT <= STATE_CS;
-                    CS_r <= 1;
+                    Att_CS_r <= DelAttSelect[0];
+                    Del_CS_r <= DelAttSelect[1];
                 end
             end
             STATE_CS: begin
@@ -138,6 +144,7 @@ output wire CS);
 
     assign DataBit = data_register_r[0];
     assign SPI_clk = SPI_clk_r;
-    assign CS = CS_r;
+    assign Att_CS = Att_CS_r;
+    assign Del_CS = Del_CS_r;
 
 endmodule

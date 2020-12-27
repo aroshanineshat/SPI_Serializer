@@ -4,25 +4,29 @@ module test;
     reg clk;
     reg [31:0] Inputdata = 32'h00000000;
     reg ld;
+    reg [1:0] Chip_select;
 
     wire serial_databit;
     wire serial_clk;
-    wire serial_cs;
+    wire serial_att_cs;
+    wire serial_del_cs;
 
     initial begin
         clk = 0;
         ld  = 0;
-
+        Chip_select = 0;
         forever begin
             #1 clk = ~clk;
         end
     end
 
     initial begin
+        #1 Chip_select = 2'b01;
         #9 ld = 1;
-        #1 ld = 0;
+        #2 ld = 0;
+        #1190 Chip_select = 2'b10;
         #1199 ld = 1;
-        #1 ld = 0;
+        #2 ld = 0;
     end
 
     initial begin
@@ -35,8 +39,10 @@ module test;
 .Data_Register(Inputdata),
 .ld(ld),
 .DataBit(serial_databit),
+.DelAttSelect(Chip_select),
 .SPI_clk(serial_clk),
-.CS(serial_cs));
+.Att_CS(serial_att_cs),
+.Del_CS(serial_del_cs));
 
     initial begin
         #5000 $finish;
